@@ -73,6 +73,9 @@ onetrust_patterns: Tuple = (onetrust_pattern_A, onetrust_pattern_B, cmp_cookiela
 # Termly CDN domain
 termly_url_pattern = re.compile("https://app\\.termly\\.io/")
 
+# Usercentric CDN domain
+usercentric_url_pattern = re.compile("https://app\\.usercentrics\\.eu/")
+
 # timeout in seconds
 connect_timeout = 60  # how long to connect at most
 load_timeout = 60     # how long to wait for website content
@@ -127,6 +130,13 @@ def check_termly_presence(resp: requests.Response) -> bool:
     """ Check whether a Termly pattern is referenced on the website """
     psource = resp.text
     matchobj = termly_url_pattern.search(psource, re.IGNORECASE)
+    return matchobj is not None
+
+
+def check_usercentric_presence(resp: requests.Response) -> bool:
+    """ Check whether a Termly pattern is referenced on the website """
+    psource = resp.text
+    matchobj = usercentric_url_pattern.search(psource, re.IGNORECASE)
     return matchobj is not None
 
 
@@ -220,6 +230,10 @@ def run_reachability_check(input_domain: str) -> Tuple[Optional[str], int]:
         found_cmp = check_termly_presence(r)
         if found_cmp:
             return final_url, QuickCrawlResult.TERMLY
+          
+        found_cmp = check_usercentric_presence(r)
+        if found_cmp:
+            return final_url, QuickCrawlResult.USERCENTRIC          
 
         return final_url, QuickCrawlResult.NOCMP
 
@@ -269,6 +283,7 @@ def open_filedescriptors(outdir: str) -> Dict[int, Any]:
         fd_dict[QuickCrawlResult.COOKIEBOT] = open(os.path.join(outdir, "cookiebot_responses.txt"), 'w')
         fd_dict[QuickCrawlResult.ONETRUST] = open(os.path.join(outdir, "onetrust_responses.txt"), 'w')
         fd_dict[QuickCrawlResult.TERMLY] = open(os.path.join(outdir, "termly_responses.txt"), 'w')
+        fd_dict[QuickCrawlResult.USERCENTRIC] = open(os.path.join(outdir, "usercentric_responses.txt"), 'w')      
     else:
         fd_dict[QuickCrawlResult.OK] = open(os.path.join(outdir, "ok_responses.txt"), 'w')
 
