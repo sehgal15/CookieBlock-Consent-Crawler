@@ -101,6 +101,7 @@ class QuickCrawlResult(IntEnum):
     COOKIEBOT = 5
     ONETRUST = 6
     TERMLY = 7
+    USERCENTRIC = 8
 
 
 def check_cookiebot_presence(resp: requests.Response) -> bool:
